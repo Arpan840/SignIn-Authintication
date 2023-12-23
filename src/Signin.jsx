@@ -4,7 +4,12 @@ import { toast } from "react-toastify";
 
 const Signin = () => {
   let navigate = useNavigate();
-  const [input, setInput] = useState({ username: "", password: "" });
+  const [input, setInput] = useState({
+    username: "",
+    password: "",
+    signIn: false,
+  });
+
   const handelChange = (event) => {
     setInput((preValue) => {
       return {
@@ -15,6 +20,9 @@ const Signin = () => {
   };
   async function handelSubmit(e) {
     e.preventDefault();
+    setInput({
+      signIn: true,
+    });
     try {
       const response = await fetch("https://dummyjson.com/auth/login", {
         method: "POST",
@@ -25,12 +33,16 @@ const Signin = () => {
         const token = await response.text();
         localStorage.setItem("token", `${token}`);
         toast.success("success", response.statusText);
-
+        setInput({
+          signIn:false
+        })
         navigate("/profile");
       } else {
         let errorMessage = await response.text();
         let parsedMessage = JSON.parse(errorMessage);
-
+        setInput({
+          signIn:false
+        })
         toast.error(parsedMessage.message);
         localStorage.clear("token");
       }
@@ -73,7 +85,13 @@ const Signin = () => {
         </div>
 
         <button type="submit" className="btn btn-primary w-100 p-3">
-          Continue
+          {input.signIn ? (
+            <div class="spinner-border text-light" role="status">
+              <span class="sr-only"></span>
+            </div>
+          ) : (
+            "Continue"
+          )}
         </button>
         <div className="text-center text-primary mt-2">
           Forget your password?
